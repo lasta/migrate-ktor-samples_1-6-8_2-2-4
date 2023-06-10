@@ -1,0 +1,1 @@
+rootProject.name = "migrate-ktor-samples_1x-2x"
