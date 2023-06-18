@@ -1,6 +1,3 @@
-import org.gradle.kotlin.dsl.exclude
-import org.gradle.kotlin.dsl.testImplementation
-
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
