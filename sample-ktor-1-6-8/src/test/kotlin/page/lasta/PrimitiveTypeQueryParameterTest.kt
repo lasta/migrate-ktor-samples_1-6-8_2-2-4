@@ -17,14 +17,14 @@ class PrimitiveTypeQueryParameterTest {
     @Location(PATH)
     @Suppress("unused")
     class WithoutDefaultValuesLocation(
-        val intValue: Int,
+        val intValue: Int?,
     )
 
     @Nested
     inner class RequiredParameterTest {
 
         private fun withHandleRequest(
-            queryParameters: List<Pair<String, String>>,
+            queryString: String,
             block: TestApplicationCall.() -> Unit
         ) {
             withTestApplication(
@@ -38,23 +38,20 @@ class PrimitiveTypeQueryParameterTest {
                     }
                 }
             ) {
-                val queryString = queryParameters.joinToString(prefix = "?", separator = "&") { (key, value) ->
-                    "$key=$value"
-                }
                 handleRequest(HttpMethod.Get, "$PATH$queryString").run(block)
             }
         }
 
         @Test
         fun `when a required parameter is missing then returns NotFound`() {
-            withHandleRequest(emptyList()) {
+            withHandleRequest("") {
                 assertEquals(HttpStatusCode.NotFound, response.status())
             }
         }
 
         @Test
         fun `when a required parameter is provided then returns OK`() {
-            withHandleRequest(listOf("intValue" to "1")) {
+            withHandleRequest("?intValue=42") {
                 assertEquals(HttpStatusCode.OK, response.status())
             }
         }
