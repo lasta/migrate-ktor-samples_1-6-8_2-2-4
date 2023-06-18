@@ -1,5 +1,3 @@
-@file:OptIn(KtorExperimentalLocationsAPI::class)
-
 package page.lasta
 
 import io.ktor.client.request.*
@@ -7,9 +5,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
-import io.ktor.server.locations.*
+import io.ktor.server.resources.*
 import io.ktor.server.resources.Resources
-import io.ktor.server.resources.get
 import io.ktor.server.response.*
 import io.ktor.server.testing.*
 import org.junit.jupiter.api.Assertions
