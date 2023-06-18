@@ -4,7 +4,6 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import page.lasta.plugins.configureRouting
-import page.lasta.plugins.configureSecurity
 import page.lasta.plugins.configureSerialization
 
 fun main() {
@@ -13,7 +12,6 @@ fun main() {
 }
 
 fun Application.module() {
-    configureSecurity()
     configureSerialization()
     configureRouting()
 }
