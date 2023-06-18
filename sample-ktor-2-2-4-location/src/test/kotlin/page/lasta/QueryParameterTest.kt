@@ -1,3 +1,5 @@
+@file:OptIn(KtorExperimentalLocationsAPI::class)
+
 package page.lasta
 
 import io.ktor.client.request.*
@@ -5,9 +7,11 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.locations.*
+import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.testing.*
-import org.junit.jupiter.api.Assertions
+import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -18,7 +22,6 @@ import java.util.stream.Stream
 
 class QueryParameterWithLocationPluginTest {
 
-    @OptIn(KtorExperimentalLocationsAPI::class)
     @ArgumentsSources(
         ArgumentsSource(RequiredParameterTestCase::class),
         ArgumentsSource(OptionalParameterTestCases::class),
@@ -28,10 +31,15 @@ class QueryParameterWithLocationPluginTest {
         @Suppress("UNUSED_PARAMETER") name: String,
         path: String,
         queryString: String,
-        expected: HttpStatusCode,
+        expectedStatusCode: HttpStatusCode,
+        expectedBodyText: String,
     ) {
         withHandleRequest(path = path, queryString = queryString) { response ->
-            Assertions.assertEquals(expected, response.status)
+            assertEquals(expectedStatusCode, response.status)
+            val bodyText = runBlocking {
+                response.bodyAsText()
+            }
+            assertEquals(expectedBodyText, bodyText)
         }
     }
 
@@ -43,24 +51,28 @@ class QueryParameterWithLocationPluginTest {
                 REQUIRED_PARAMETER_PATH,
                 "",
                 HttpStatusCode.BadRequest,
+                "",
             ),
             Arguments.arguments(
                 "When only the key is provided",
                 REQUIRED_PARAMETER_PATH,
                 "?param",
-                HttpStatusCode.BadRequest,
+                HttpStatusCode.InternalServerError,
+                "500: java.lang.IllegalArgumentException: argument type mismatch",
             ),
             Arguments.arguments(
                 "When there is no right-hand side",
                 REQUIRED_PARAMETER_PATH,
                 "?param=",
                 HttpStatusCode.BadRequest,
+                "",
             ),
             Arguments.arguments(
                 "When the required parameter is provided",
                 REQUIRED_PARAMETER_PATH,
                 "?param=42",
                 HttpStatusCode.OK,
+                "OK",
             ),
         )
     }
@@ -73,41 +85,49 @@ class QueryParameterWithLocationPluginTest {
                 OPTIONAL_PARAMETER_PATH,
                 "",
                 HttpStatusCode.OK,
+                "OK",
             ),
             Arguments.arguments(
                 "When only the key is provided",
                 OPTIONAL_PARAMETER_PATH,
                 "?param",
-                HttpStatusCode.BadRequest,
+                HttpStatusCode.InternalServerError,
+                "500: java.lang.IllegalArgumentException: argument type mismatch",
             ),
             Arguments.arguments(
                 "When there is no right-hand side",
                 OPTIONAL_PARAMETER_PATH,
                 "?param=",
                 HttpStatusCode.BadRequest,
+                "",
             ),
             Arguments.arguments(
                 "When the required parameter is provided",
                 OPTIONAL_PARAMETER_PATH,
                 "?param=42",
                 HttpStatusCode.OK,
+                "OK",
             ),
         )
     }
 
-    @KtorExperimentalLocationsAPI
     private fun withHandleRequest(
         path: String,
         queryString: String,
         assertionBlock: (HttpResponse) -> Unit,
     ) = testApplication {
         install(Locations)
+        install(StatusPages) {
+            exception<IllegalArgumentException> { call, cause ->
+                call.respondText(text = "500: $cause", status = HttpStatusCode.InternalServerError)
+            }
+        }
         routing {
             get<RequiredParameterLocation> {
-                call.respond(HttpStatusCode.OK)
+                call.respond(HttpStatusCode.OK, "OK")
             }
             get<OptionalParameterLocation> {
-                call.respond(HttpStatusCode.OK)
+                call.respond(HttpStatusCode.OK, "OK")
             }
         }
 
