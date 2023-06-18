@@ -1,5 +1,3 @@
-@file:OptIn(KtorExperimentalLocationsAPI::class)
-
 package page.lasta
 
 import io.ktor.application.*
@@ -19,16 +17,26 @@ import page.lasta.plugins.configureDataConversion
 import java.util.stream.Stream
 
 
+@OptIn(KtorExperimentalLocationsAPI::class)
 class QueryParameterTest {
 
     @Location(PATH)
     @Suppress("unused")
-    class TestPrimitiveTypeParameterLocation(val intValue: Int = 42, val intNullableValue: Int?)
+    class TestPrimitiveTypeParameterLocation(
+        val intValue: Int,
+        val intNullableValue: Int?,
+        val intValueWithDefault: Int = 42,
+        val intNullableValueWithDefault: Int? = null,
+    )
 
     @ArgumentsSource(TestCaseProvider::class)
-    @ParameterizedTest(name = "query: {0}, expected: {1}")
-    fun test(queryString: String, expected: HttpStatusCode) {
-        withHandleRequest(queryString) {
+    @ParameterizedTest(name = "query: {0}, then returns {2}")
+    fun test(
+        @Suppress("UNUSED_PARAMETER") description: String,
+        queryParameters: List<Pair<String, String>>,
+        expected: HttpStatusCode
+    ) {
+        withHandleRequest(queryParameters) {
             assertEquals(expected, response.status())
         }
     }
@@ -36,15 +44,21 @@ class QueryParameterTest {
     private class TestCaseProvider : ArgumentsProvider {
         override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> = Stream.of(
             arguments(
-                "", HttpStatusCode.BadRequest
+                "When required parameters are not provider", emptyList<Pair<String, String>>(), HttpStatusCode.NotFound
             ),
+            arguments(
+                "When a required parameter is missing", listOf("intValue" to "1"), HttpStatusCode.NotFound
+            ),
+            arguments(
+                "When required parameters are provided", listOf("intValue" to "1", "intNullableValue" to "2"), HttpStatusCode.OK
+            )
         )
     }
 
     companion object {
         private const val PATH = "/test"
         private fun withHandleRequest(
-            queryString: String,
+            queryParameters: List<Pair<String, String>>,
             assertionBlock: TestApplicationCall.() -> Unit
         ) = withTestApplication(
             {
@@ -57,9 +71,10 @@ class QueryParameterTest {
                 }
             }
         ) {
-            with(handleRequest(HttpMethod.Get, "$PATH?$queryString")) {
-                assertionBlock()
+            val queryString = queryParameters.joinToString(prefix = "?", separator = "&") { (key, value) ->
+                "$key=$value"
             }
+            handleRequest(HttpMethod.Get, "$PATH$queryString").run(assertionBlock)
         }
     }
 }
