@@ -110,7 +110,7 @@ class QueryParameterTest {
     private fun withHandleRequest(
         path: String,
         queryString: String,
-        block: TestApplicationCall.() -> Unit
+        assertionBlock: TestApplicationCall.() -> Unit
     ) {
         withTestApplication(
             {
@@ -125,7 +125,7 @@ class QueryParameterTest {
                 }
             }
         ) {
-            handleRequest(HttpMethod.Get, "$path$queryString").run(block)
+            handleRequest(HttpMethod.Get, "$path$queryString").run(assertionBlock)
         }
     }
 
