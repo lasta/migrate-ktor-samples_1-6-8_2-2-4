@@ -18,7 +18,7 @@ import page.lasta.plugins.configureDataConversion
 import java.util.stream.Stream
 
 @OptIn(KtorExperimentalLocationsAPI::class)
-class PrimitiveTypeQueryParameterTest {
+class QueryParameterTest {
 
     @ArgumentsSources(
         ArgumentsSource(RequiredParameterTestCase::class),
