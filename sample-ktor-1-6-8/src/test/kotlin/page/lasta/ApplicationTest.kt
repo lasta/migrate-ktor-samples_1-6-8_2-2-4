@@ -2,8 +2,8 @@ package page.lasta
 
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import org.junit.jupiter.api.Test
 import page.lasta.plugins.configureRouting
-import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ApplicationTest {
