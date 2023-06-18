@@ -1,1 +1,1 @@
-rootProject.name = "migrate-ktor-samples_1x-2x"
+rootProject.name = "Ktor 2.2.4 with Resource Plugin"
