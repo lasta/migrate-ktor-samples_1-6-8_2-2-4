@@ -20,7 +20,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource
 import org.junit.jupiter.params.provider.ArgumentsSources
 import java.util.stream.Stream
 
-class QueryParameterWithLocationPluginTest {
+class QueryParameterTest {
 
     @ArgumentsSources(
         ArgumentsSource(RequiredParameterTestCase::class),
