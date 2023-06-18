@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
 import org.junit.jupiter.params.provider.ArgumentsSources
-import page.lasta.plugins.configureDataConversion
 import java.util.stream.Stream
 
 @OptIn(KtorExperimentalLocationsAPI::class)
@@ -115,7 +114,6 @@ class QueryParameterTest {
     ) {
         withTestApplication(
             {
-                configureDataConversion()
                 install(Locations)
                 routing {
                     get<RequiredParameterLocation> {
