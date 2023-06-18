@@ -18,7 +18,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource
 import org.junit.jupiter.params.provider.ArgumentsSources
 import java.util.stream.Stream
 
-class QueryParameterWithResourcePluginTest {
+class QueryParameterTest {
 
     @ArgumentsSources(
         ArgumentsSource(RequiredParameterTestCase::class),
