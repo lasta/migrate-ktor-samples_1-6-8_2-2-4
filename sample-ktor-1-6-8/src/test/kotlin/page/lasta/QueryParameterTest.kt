@@ -48,19 +48,19 @@ class QueryParameterTest {
             arguments(
                 "When only the key is provided",
                 REQUIRED_PARAMETER_PATH,
-                "?intValue",
+                "?param",
                 HttpStatusCode.BadRequest,
             ),
             arguments(
                 "When there is no right-hand side",
                 REQUIRED_PARAMETER_PATH,
-                "?intValue=",
+                "?param=",
                 HttpStatusCode.BadRequest,
             ),
             arguments(
                 "When the required parameter is provided",
                 REQUIRED_PARAMETER_PATH,
-                "?intValue=42",
+                "?param=42",
                 HttpStatusCode.OK,
             ),
         )
@@ -78,19 +78,19 @@ class QueryParameterTest {
             arguments(
                 "When only the key is provided",
                 OPTIONAL_PARAMETER_PATH,
-                "?intValue",
+                "?param",
                 HttpStatusCode.BadRequest,
             ),
             arguments(
                 "When there is no right-hand side",
                 OPTIONAL_PARAMETER_PATH,
-                "?intValue=",
+                "?param=",
                 HttpStatusCode.BadRequest,
             ),
             arguments(
                 "When the required parameter is provided",
                 OPTIONAL_PARAMETER_PATH,
-                "?intValue=42",
+                "?param=42",
                 HttpStatusCode.OK,
             ),
         )
@@ -99,13 +99,13 @@ class QueryParameterTest {
     @Location(REQUIRED_PARAMETER_PATH)
     @Suppress("unused")
     class RequiredParameterLocation(
-        val intValue: Int?,
+        val param: Int?,
     )
 
     @Location(OPTIONAL_PARAMETER_PATH)
     @Suppress("unused")
     class OptionalParameterLocation(
-        val intValue: Int? = 42,
+        val param: Int? = 42,
     )
 
     private fun withHandleRequest(
